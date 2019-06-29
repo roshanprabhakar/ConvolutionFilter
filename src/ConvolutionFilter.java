@@ -1,68 +1,58 @@
+import java.awt.*;
+import java.util.Arrays;
 
-//Convolution kernels can only be squares
 public class ConvolutionFilter {
 
-    private short[][] kernel;
-    private int weight;
-    int totalBits;
+    private int[][] image;
+    private int[][] weights;
+    private double[][] doubleWeights;
 
-    public int getWeight() {
-        return weight;
+    private int[][] convolved;
+
+    public ConvolutionFilter(int[][] image, int[][] weights) {
+
+        this.image = image;
+        this.weights = weights;
+
+        convolve();
     }
 
-    public short[][] getKernel() {
-        return kernel;
-    }
+    public void convolve() {
 
-    public ConvolutionFilter(short[][] kernel) {
-        this.kernel = kernel;
+        int sum;
+        int[][] convolved = new int[image.length][image[0].length];
 
-        int sum = 0;
-        totalBits = 0;
-
-        for (int r = 0; r < kernel.length; r++) {
-            for (int c = 0; c < kernel[r].length; c++) {
-                sum += kernel[r][c];
-                totalBits++;
-            }
-        }
-
-        if (sum == 0) sum++;
-        this.weight = sum;
-    }
-
-    public int[][] convolve(int[][] img) {
-
-        int[][] out = deepClone(img);
-
-        int pixelSum, kernelVal, pixelVal;
-
-        for (int r = 0; r < img.length - kernel.length; r++) {
-            for (int c = 0; c < img[r].length - kernel.length; c++) {
-
-                pixelSum = 0;
-                for (int i = 0; i < kernel.length; i++) {
-                    for (int j = 0; j < kernel.length; j++) {
-                        kernelVal = kernel[i][j];
-                        pixelVal = img[r + i][c + j];
-                        pixelSum += kernelVal * pixelVal;
+        for (int r = 0; r < convolved.length - weights.length - 1; r++) {
+            for (int c = 0; c < convolved[r].length - weights.length - 1; c++) {
+                sum = 0;
+                for (int i = 0; i < weights.length; i++) {
+                    for (int j = 0; j < weights[i].length; j++) {
+                        sum += image[r + i][c + j] * weights[i][j];
                     }
                 }
-                if (pixelSum < 0) {
-                    pixelSum = 0;
-                }
-                pixelSum /= this.weight;
-                out[r][c] = pixelSum;
+                convolved[r][c] = sum / weight();
             }
         }
-        return out;
+
+        this.convolved = convolved;
     }
 
-    private int[][] deepClone(int[][] img) {
-        int[][] out = img.clone();
-        for (int r = 0; r < img.length; r++) {
-            out[r] = img[r].clone();
-        }
-        return out;
+    public int numWeights() {
+        return weights.length * weights[0].length;
     }
+
+    public int weight() {
+        int sum = 0;
+        for (int r = 0; r < weights.length; r++) {
+            for (int c = 0; c < weights[r].length; c++) {
+                sum += weights[r][c];
+            }
+        }
+        if (sum == 0) return 1; else return sum;
+    }
+
+    public int[][] getConvolved() {
+        return convolved;
+    }
+
 }

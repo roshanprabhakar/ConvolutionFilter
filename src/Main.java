@@ -1,20 +1,23 @@
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
 public class Main {
 
     public static void main(String[] args) {
+        try {
+            BufferedImage image = ImageIO.read(new File("sketch.jpg"));
+            ImageProcessor processor = new ImageProcessor(image, ConvolutionLib.identity);
 
-        ConvolutionFilter filter = new ConvolutionFilter(
-                new short[][]{
-                        {-1,0,1},
-                        {-1,0,1},
-                        {-1,0,1},
-                }
-        );
+            //alter processor
 
-        ImageProcessor imageProcessor = new ImageProcessor("convolutionTest.jpg");
+            processor.apply();
+            processor.display();
 
-        int[][] array = imageProcessor.getRGBarray();
-        array = filter.convolve(array);
-        imageProcessor.setRGBvalues(array);
-        imageProcessor.display(1000, 1200);
+
+        } catch (IOException e) {
+            System.err.println("Could not read image file!");
+        }
     }
 }
