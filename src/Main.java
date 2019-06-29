@@ -14,8 +14,6 @@ public class Main {
 
             processor.apply();
             processor.display();
-
-
         } catch (IOException e) {
             System.err.println("Could not read image file!");
         }
